@@ -1,103 +1,127 @@
-import Image from "next/image";
+"use client"
+
+import Link from "next/link";
+import { useState } from "react";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  type Category = keyof typeof categorizedTools;
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // Tool list with routes
+  const categorizedTools = {
+    Arithmetic: [
+      { name: "Calculator", route: "/calculator", desc: "Basic arithmetic calculator for quick calculations." },
+      { name: "Unit Converter", route: "/unit-converter", desc: "Convert between units of length, mass, time, and more." },
+    ],
+    "Algebra / Precalc": [
+      { name: "Function Simplifier", route: "/function-simplifier", desc: "Simplify algebraic expressions step by step." },
+      { name: "Rational Equations", route: "/rational-equations", desc: "Analyze and graph quadratics: vertex, intercepts, direction, and more." },
+      { name: "Polynomial Factorer", route: "/polynomial-factorer", desc: "Factor polynomials using various techniques, step by step." },
+      { name: "System of Equations Solver", route: "/system-solver", desc: "Solve systems of linear equations using substitution, elimination, or matrices." },
+      { name: "Inequality Solver", route: "/inequality-solver", desc: "Solve algebraic inequalities step by step, including linear, polynomial, and rational inequalities." },
+      { name: "Equation Solver", route: "/equation-solver", desc: "Solve algebraic equations step by step." },
+      { name: "Triangle Solver", route: "/triangle-solver", desc: "Solve triangles using Law of Sines, Law of Cosines, and compute unknown sides/angles." },
+    ],
+    "Linear Algebra": [
+      { "name": "Matrix Ops", "route": "/matrix-ops", "desc": "Perform matrix operations like addition, inverse, and more." },
+      { "name": "Determinant & Rank", "route": "/det-rank", "desc": "Calculate the determinant and rank of matrices." },
+      { "name": "Eigenvalues & Eigenvectors", "route": "/eigen", "desc": "Compute eigenvalues and eigenvectors of a matrix." },
+      { "name": "LU & QR Decomposition", "route": "/decomposition", "desc": "Perform LU and QR matrix decompositions." },
+      { "name": "Linear Systems Solver", "route": "/linear-solver", "desc": "Solve systems of linear equations using matrices." },
+      { "name": "Vector Spaces", "route": "/vector-spaces", "desc": "Explore basis, dimension, and span of vector spaces." },
+      { "name": "Orthogonality & Projections", "route": "/orthogonality", "desc": "Work with orthogonal vectors and projections." },
+    ],
+    Statistics: [
+      { name: "Statistics Helper", route: "/statistics-helper", desc: "Mean, median, mode, standard deviation made simple." },
+      { name: "t Tests", route: "/t-tests", desc: "Easily perform one-sample, two-sample, and paired t-tests to compare group means." },
+      { name: "z Tests", route: "/z-tests", desc: "Conduct one-sample and two-sample z-tests to compare population means when standard deviations are known." },
+      { name: "Chi Square Tests", route: "/chi-tests", desc: "Perform chi-square tests for goodness-of-fit and independence to analyze categorical data and observed vs. expected frequencies." }
+    ],
+
+    "Number Theory & Discrete Math": [
+      {
+        name: "Prime Factorizer & GCD/LCM Tool",
+        route: "/prime-factorizer",
+        desc: "Break down integers into primes, compute greatest common divisors and least common multiples step by step."
+      },
+      {
+        name: "Modular Arithmetic Helper",
+        route: "/modular-arithmetic",
+        desc: "Perform modular addition, multiplication, inverses, and solve congruences."
+      },
+      {
+        name: "Combinatorics & Probability",
+        route: "/combinatorics-probability",
+        desc: "Permutations & combinations calculator, binomial theorem expansion, and basic probability events (independent, conditional)."
+      },
+    ],
+
+    Calculus: [
+      { name: "Derivative Calculator", route: "/derivative", desc: "Compute derivatives of functions step by step." },
+      { name: "Integral Calculator", route: "/integral", desc: "Find indefinite and definite integrals easily." },
+    ],
+  };
+
+  const [search, setSearch] = useState("");
+
+  const filteredCategories = Object.entries(categorizedTools).reduce(
+    (acc, [category, tools]) => {
+      const filtered = tools.filter((tool) =>
+        tool.name.toLowerCase().includes(search.toLowerCase()) ||
+        tool.desc.toLowerCase().includes(search.toLowerCase())
+      );
+
+      if (filtered.length > 0) {
+        acc[category as keyof typeof categorizedTools] = filtered;
+      }
+
+      return acc;
+    },
+    {} as Partial<typeof categorizedTools>
+  );
+
+  return (
+    <main className="min-h-screen bg-[#fdfcf9] px-6 py-12 text-gray-800">
+      <div className="max-w-5xl mx-auto">
+        {/* Title */}
+        <h1 className="text-5xl md:text-6xl font-extrabold text-center mb-4 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 bg-clip-text text-transparent">
+          Sarva Math Suite
+        </h1>
+        <p className="text-center text-lg text-gray-600 mb-6">
+          A collection of sleek tools to help you explore, calculate, and conquer math.
+        </p>
+
+        {/* Search */}
+        <div className="mb-10 flex justify-center">
+          <input
+            type="text"
+            placeholder="Search tools..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full max-w-md px-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        {/* Tools Grouped by Category */}
+        {Object.entries(filteredCategories).map(([category, tools]) => (
+          <div key={category} className="mb-10">
+            <h2 className="text-2xl font-semibold mb-4 text-purple-600">{category}</h2>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {tools.map((tool) => (
+                <Link
+                  key={tool.name}
+                  href={tool.route}
+                  className="rounded-2xl p-6 shadow-md bg-white hover:shadow-lg transition duration-200 border border-gray-100 hover:bg-gray-50"
+                >
+                  <h3 className="text-xl font-semibold mb-2 text-gray-900">
+                    {tool.name}
+                  </h3>
+                  <p className="text-sm text-gray-500">{tool.desc}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </main>
   );
 }
